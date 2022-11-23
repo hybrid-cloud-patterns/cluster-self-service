@@ -6,38 +6,53 @@ clusterGroup:
   namespaces:
   - hive
   - vault
+  - hypershift
+  - multicluster-engine
   - golang-external-secrets
 
   subscriptions:
     hive:
       name: hive
-      namespace: hive
+      namespace: openshift-operators
       channel: alpha
-      #channel: ocm-2.4
+      #channel: ocm-2.4 # more stable?
       source: community-operators
+
+    hypershift:
+      name: multicluster-engine
+      namespace: multicluster-engine
+      channel: stable-2.1
 
   projects:
   - hub
+  - demo
 
   applications:
     vault:
+      project: hub
       name: vault
       namespace: vault
-      project: hub
       path: common/hashicorp-vault
 
     golang-external-secrets:
+      project: hub
       name: golang-external-secrets
       namespace: golang-external-secrets
-      project: hub
       path: common/golang-external-secrets
 
     prereq:
+      project: hub
       name: cluster-template-service
       namespace: hive
-      project: hub
       path: charts/service
 
+    clusters:
+      project: demo
+      name: hosted-clusters
+      namespace: hypershift
+      path: devconf-template/templates
+      repoURL: https://github.com/rawagner/helm-demo/
+      targetRevision: main
 
   imperative:
     # For additional details, please refer to
