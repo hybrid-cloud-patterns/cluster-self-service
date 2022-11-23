@@ -7,7 +7,11 @@ clusterGroup:
   - vault
   - golang-external-secrets
 
-  subscriptions: {}
+  subscriptions:
+    hive:
+      name: hive
+      namespace: openshift-operators
+      channel: ocm-2.4
 
   projects:
   - hub
