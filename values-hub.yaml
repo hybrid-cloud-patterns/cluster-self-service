@@ -4,14 +4,17 @@ clusterGroup:
   insecureUnsealVaultInsideCluster: true
 
   namespaces:
+  - hive
   - vault
   - golang-external-secrets
 
   subscriptions:
     hive:
       name: hive
-      namespace: openshift-operators
-      channel: ocm-2.4
+      namespace: hive
+      channel: alpha
+      #channel: ocm-2.4
+      source: community-operators
 
   projects:
   - hub
@@ -28,6 +31,13 @@ clusterGroup:
       namespace: golang-external-secrets
       project: hub
       path: common/golang-external-secrets
+
+    prereq:
+      name: cluster-template-service
+      namespace: hive
+      project: hub
+      path: charts/service
+
 
   imperative:
     # For additional details, please refer to
