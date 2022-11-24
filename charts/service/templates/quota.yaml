@@ -7,5 +7,6 @@ metadata:
 spec:
   budget: 5
   allowedTemplates:
-  - name: hypershift-xray
-  - name: hypershift-bobbycar
+{{- range .Values.patterns }}
+  - name: hypershift-{{ .name }}
+{{- end }}
