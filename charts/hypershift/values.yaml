@@ -4,3 +4,5 @@
 
 #ocpVersion: 4.10.33
 #baseDomain: example.com
+pullSecretName: hypershiftPullSecret
+sshSecretName: hypershiftSSHSecret
