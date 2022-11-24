@@ -34,24 +34,26 @@ spec:
     syncPolicy:
       automated: {}
   clusterSetup:
-    destination:
-      namespace: clusters
-      server: 'https://kubernetes.default.svc'
-    project: default
-    source:
-      path: common/install
-      repoURL: {{ .repo }}
-      targetRevision: main
-      helm:
-        parameters:
-        - name: main.git.repoURL
-          value: $ARGOCD_APP_SOURCE_REPO_URL
-        - name: main.git.revision
-          value: $ARGOCD_APP_SOURCE_TARGET_REVISION	
-        - name: main.git.clusterGroupName
-          value: hub
-    syncPolicy:
-      automated: {}
+  - name: {{ .name }} Pattern Installation
+    spec:
+      destination:
+        namespace: clusters
+        server: 'https://kubernetes.default.svc'
+      project: default
+      source:
+        path: common/install
+        repoURL: {{ .repo }}
+        targetRevision: main
+        helm:
+          parameters:
+          - name: main.git.repoURL
+            value: $ARGOCD_APP_SOURCE_REPO_URL
+          - name: main.git.revision
+            value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+          - name: main.git.clusterGroupName
+            value: hub
+      syncPolicy:
+        automated: {}
   cost: 2
 {{- if .deploy }}
 ---
