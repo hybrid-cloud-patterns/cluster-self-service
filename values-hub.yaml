@@ -50,7 +50,7 @@ clusterGroup:
       project: demo
       name: hosted-clusters
       namespace: hypershift
-      path: devconf-template/templates
+      path: devconf-template
       repoURL: https://github.com/rawagner/helm-demo/
       targetRevision: main
 
