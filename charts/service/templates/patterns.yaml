@@ -70,6 +70,6 @@ spec:
   parameters:
     - name: ocpVersion
       value: 4.11.12
----
 {{- end }}
+---
 {{- end }}
