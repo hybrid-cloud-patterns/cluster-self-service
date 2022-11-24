@@ -1,0 +1,69 @@
+{{- range .Values.patterns }}
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: hypershift-{{ .name }}
+spec:
+  clusterDefinition:
+    destination:
+      namespace: clusters
+      server: 'https://kubernetes.default.svc'
+    project: default
+    source:
+# Use Rastislav's demo as a base
+      path: devconf-template
+      repoURL: https://github.com/rawagner/helm-demo/
+      targetRevision: main
+
+#
+# Or, use a published chart (doesn't seem to exist though)
+#      repoURL: 'https://stolostron.github.io/cluster-templates-operator'
+#      chart: hypershift-template
+#      targetRevision: 0.0.2
+#
+# Or, use the 'official' chart from its source
+#      repoURL: https://github.com/stolostron/cluster-templates-operator'
+#      path: hypershift-template
+#      targetRevision: helm-repo
+#
+# Or, use the current repo+version
+#      path: hypershift-template
+#      repoURL: {{ $.Values.global.repoURL }}
+#      targetRevision: {{ $.Values.global.targetRevision }}
+
+    syncPolicy:
+      automated: {}
+  clusterSetup:
+    destination:
+      namespace: clusters
+      server: 'https://kubernetes.default.svc'
+    project: default
+    source:
+      path: common/install
+      repoURL: {{ .repo }}
+      targetRevision: main
+      helm:
+        parameters:
+        - name: main.git.repoURL
+          value: $ARGOCD_APP_SOURCE_REPO_URL
+        - name: main.git.revision
+          value: $ARGOCD_APP_SOURCE_TARGET_REVISION	
+        - name: main.git.clusterGroupName
+          value: hub
+    syncPolicy:
+      automated: {}
+  cost: 2
+{{- if .deploy }}
+---
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplateInstance
+metadata:
+  name: demo-{{ .name }}
+spec:
+  clusterTemplateRef: hypershift-{{ .name }}
+  parameters:
+    - name: ocpVersion
+      value: 4.11.12
+---
+{{- end }}
+{{- end }}

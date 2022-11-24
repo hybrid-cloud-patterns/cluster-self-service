@@ -1,2 +1,7 @@
-tree:
-  of: "values"
+patterns:
+- name: xray
+  repo: https://github.com/hybrid-cloud-patterns/medical-diagnosis/
+  deploy: false
+- name: bobbycar
+  repo: https://github.com/hybrid-cloud-patterns/connected-vehicle-architecture/
+  deploy: true
