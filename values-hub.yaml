@@ -46,13 +46,13 @@ clusterGroup:
       namespace: hive
       path: charts/service
 
-    clusters:
-      project: demo
-      name: hosted-clusters
-      namespace: hypershift
-      path: devconf-template
-      repoURL: https://github.com/rawagner/helm-demo/
-      targetRevision: main
+    #clusters:
+    #  project: demo
+    #  name: hosted-clusters
+    #  namespace: hypershift
+    #  path: devconf-template
+    #  repoURL: https://github.com/rawagner/helm-demo/
+    #  targetRevision: main
 
   imperative:
     # For additional details, please refer to
