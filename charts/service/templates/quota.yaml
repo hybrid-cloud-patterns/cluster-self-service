@@ -2,6 +2,8 @@ apiVersion: clustertemplate.openshift.io/v1alpha1
 kind: ClusterTemplateQuota
 metadata:
   name: demo-quota
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
 spec:
   budget: 5
   allowedTemplates:

@@ -3,6 +3,8 @@ apiVersion: clustertemplate.openshift.io/v1alpha1
 kind: ClusterTemplate
 metadata:
   name: hypershift-{{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
 spec:
   clusterDefinition:
     destination:
@@ -61,6 +63,8 @@ apiVersion: clustertemplate.openshift.io/v1alpha1
 kind: ClusterTemplateInstance
 metadata:
   name: demo-{{ .name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
 spec:
   clusterTemplateRef: hypershift-{{ .name }}
   parameters:
