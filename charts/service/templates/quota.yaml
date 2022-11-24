@@ -3,7 +3,7 @@ kind: ClusterTemplateQuota
 metadata:
   name: demo-quota
   annotations:
-    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-wave: "50"
 spec:
   budget: 5
   allowedTemplates:

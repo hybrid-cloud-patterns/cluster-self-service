@@ -4,7 +4,7 @@ kind: ClusterTemplate
 metadata:
   name: hypershift-{{ .name }}
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "30"
 spec:
   clusterDefinition:
     destination:
@@ -68,7 +68,7 @@ kind: ClusterTemplateInstance
 metadata:
   name: demo-{{ .name }}
   annotations:
-    argocd.argoproj.io/sync-wave: "30"
+    argocd.argoproj.io/sync-wave: "40"
 spec:
   clusterTemplateRef: hypershift-{{ .name }}
   parameters:

@@ -33,3 +33,26 @@ spec:
       enabled: true
     - name: console-mce
       enabled: true
+---
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  labels:
+    local-cluster: "true"
+    cloud: auto-detect
+    vendor: auto-detect
+  name: local-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  hubAcceptsClient: true
+---
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+  name: managed-serviceaccount
+  namespace: local-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  installNamespace: open-cluster-management-agent-addon
