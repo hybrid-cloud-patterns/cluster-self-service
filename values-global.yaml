@@ -1,6 +1,6 @@
 ---
 global:
-  pattern: multicloud-gitops
+  pattern: cluster-self-service
 
   options:
     useCSV: false
