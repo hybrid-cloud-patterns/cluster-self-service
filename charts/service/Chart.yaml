@@ -1,6 +1,6 @@
 apiVersion: v2
-description: An empty Helm chart
+description: Patterns as a Service demo
 keywords:
 - pattern
-name: blank
+name: patterns-demo
 version: 0.0.1
