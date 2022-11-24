@@ -5,5 +5,4 @@
 ## Start Here
 
 If you've followed a link to this repository, but are not really sure what it contains
-or how to use it, head over to [Multicloud GitOps](http://hybrid-cloud-patterns.io/multicloud-gitops/)
-for additional context and installation instructions
+or how to use it, ask @beekhof for additional context and installation instructions
