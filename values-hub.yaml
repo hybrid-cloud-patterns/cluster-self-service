@@ -46,27 +46,9 @@ clusterGroup:
       namespace: golang-external-secrets
       path: common/golang-external-secrets
 
-    prereq:
+    patterns:
       project: hub
       name: cluster-template-service
       namespace: hive
       path: charts/service
 
-    #clusters:
-    #  project: demo
-    #  name: hosted-clusters
-    #  namespace: hypershift
-    #  path: devconf-template
-    #  repoURL: https://github.com/rawagner/helm-demo/
-    #  targetRevision: main
-
-  imperative:
-    # For additional details, please refer to
-    # https://hybrid-cloud-patterns.io/imperative-actions/#additional-job-customizations
-    jobs:
-    - name: regional-ca
-      # ansible playbook to be run
-      playbook: ansible/playbooks/on-hub-get-regional-ca.yml
-      # per playbook timeout in seconds
-      timeout: 234
-      # verbosity: "-v"
