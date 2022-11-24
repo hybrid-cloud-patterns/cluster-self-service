@@ -1,0 +1,83 @@
+apiVersion: hypershift.openshift.io/v1alpha1
+kind: HostedCluster
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Release.Name }}
+spec:
+  release:
+    image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64
+  pullSecret:
+    name: {{ .Release.Namespace }}-{{ .Release.Name }}-pull-secret
+  sshKey:
+    name: {{ .Release.Namespace }}-{{ .Release.Name }}-sshkey
+  networking:
+    podCIDR: 10.132.0.0/14
+    serviceCIDR: 172.31.0.0/16
+    machineCIDR: 192.168.122.0/24
+    networkType: OVNKubernetes
+  platform:
+    type: Agent
+    agent:
+      agentNamespace: devconf-infra
+  infraID: {{ .Release.Name }}
+  dns:
+    baseDomain: {{ .Values.baseDomain }}
+  services:
+  - service: APIServer
+    servicePublishingStrategy:
+      type: LoadBalancer
+  - service: OAuthServer
+    servicePublishingStrategy:
+      type: Route
+  - service: OIDC
+    servicePublishingStrategy:
+      type: Route
+  - service: Konnectivity
+    servicePublishingStrategy:
+      type: Route
+  - service: Ignition
+    servicePublishingStrategy:
+      type: Route
+---
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Release.Name }}-sshkey-external-secret
+spec:
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    name: {{ .Values.secretStore.name }}
+    kind: {{ .Values.secretStore.kind }}
+  data:
+  - secretKey: sshPrivateKey
+    remoteRef:
+      key: {{ default "secret/data/hub/privatekey" .sshPrivateKeyPath }}
+      property: content
+  target:
+    name: {{ .Release.Namespace }}-{{ .Release.Name }}-sshkey
+    template:
+      type: Opaque
+      data:
+        ssh-privatekey: |-
+          {{ "{{ .sshPrivateKey | toString }}" }}  
+---
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Release.Name }}-pull-external-secret
+spec:
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    name: {{ .Values.secretStore.name }}
+    kind: {{ .Values.secretStore.kind }}
+  data:
+  - secretKey: openshiftPullSecret
+    remoteRef:
+      key: {{ default "secret/data/hub/openshiftPullSecret" .pullSecretKeyPath }}
+      property: content
+  target:
+    name: {{ .Release.Namespace }}-{{ .Release.Name }}-pull-secret
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: |-
+          {{ "{{ .openshiftPullSecret | toString }}" }}

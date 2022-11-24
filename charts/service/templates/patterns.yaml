@@ -13,10 +13,9 @@ spec:
     project: default
     source:
 # Use Rastislav's demo as a base
-      path: devconf-template
-      repoURL: https://github.com/rawagner/helm-demo/
-      targetRevision: main
-
+#      path: devconf-template
+#      repoURL: https://github.com/rawagner/helm-demo/
+#      targetRevision: main
 #
 # Or, use a published chart (doesn't seem to exist though)
 #      repoURL: 'https://stolostron.github.io/cluster-templates-operator'
@@ -29,9 +28,9 @@ spec:
 #      targetRevision: helm-repo
 #
 # Or, use the current repo+version
-#      path: hypershift-template
-#      repoURL: {{ $.Values.global.repoURL }}
-#      targetRevision: {{ $.Values.global.targetRevision }}
+      path: charts/hypershift
+      repoURL: {{ $.Values.global.repoURL }}
+      targetRevision: {{ $.Values.global.targetRevision }}
 
     syncPolicy:
       automated: {}
@@ -70,6 +69,9 @@ spec:
   parameters:
     - name: ocpVersion
       value: 4.11.12
+    - name: baseDomain
+      # Probably this is wrong as it includes the hub's cluster name
+      value: {{ $.Values.global.clusterDomain }}
 {{- end }}
 ---
 {{- end }}
