@@ -1,0 +1,219 @@
+---
+# Source: patterns-demo/templates/patterns.yaml
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: hypershift-xray
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  clusterDefinition:
+    destination:
+      namespace: clusters
+      server: 'https://kubernetes.default.svc'
+    project: default
+    source:
+# Use Rastislav's demo as a base
+#      path: devconf-template
+#      repoURL: https://github.com/rawagner/helm-demo/
+#      targetRevision: main
+#
+# Or, use a published chart (doesn't seem to exist though)
+#      repoURL: 'https://stolostron.github.io/cluster-templates-operator'
+#      chart: hypershift-template
+#      targetRevision: 0.0.2
+#
+# Or, use the 'official' chart from its source
+#      repoURL: https://github.com/stolostron/cluster-templates-operator'
+#      path: hypershift-template
+#      targetRevision: helm-repo
+#
+# Or, use the current repo+version
+      path: charts/hypershift
+      repoURL: https://github.com/pattern-clone/mypattern
+      targetRevision: 
+      helm:
+        parameters:
+        - name: pullSecretName
+          value: hypershift-pull-secret
+        - name: sshSecretName
+          value: hypershift-sshkey
+    syncPolicy:
+      automated: {}
+  clusterSetup:
+  - name: xray Pattern Installation
+    spec:
+      destination:
+        namespace: clusters
+        server: 'https://kubernetes.default.svc'
+      project: default
+      source:
+        path: common/install
+        repoURL: https://github.com/hybrid-cloud-patterns/medical-diagnosis/
+        targetRevision: main
+        helm:
+          parameters:
+          - name: main.git.repoURL
+            value: $ARGOCD_APP_SOURCE_REPO_URL
+          - name: main.git.revision
+            value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+          - name: main.git.clusterGroupName
+            value: hub
+      syncPolicy:
+        automated: {}
+  cost: 2
+---
+# Source: patterns-demo/templates/patterns.yaml
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplate
+metadata:
+  name: hypershift-bobbycar
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  clusterDefinition:
+    destination:
+      namespace: clusters
+      server: 'https://kubernetes.default.svc'
+    project: default
+    source:
+# Use Rastislav's demo as a base
+#      path: devconf-template
+#      repoURL: https://github.com/rawagner/helm-demo/
+#      targetRevision: main
+#
+# Or, use a published chart (doesn't seem to exist though)
+#      repoURL: 'https://stolostron.github.io/cluster-templates-operator'
+#      chart: hypershift-template
+#      targetRevision: 0.0.2
+#
+# Or, use the 'official' chart from its source
+#      repoURL: https://github.com/stolostron/cluster-templates-operator'
+#      path: hypershift-template
+#      targetRevision: helm-repo
+#
+# Or, use the current repo+version
+      path: charts/hypershift
+      repoURL: https://github.com/pattern-clone/mypattern
+      targetRevision: 
+      helm:
+        parameters:
+        - name: pullSecretName
+          value: hypershift-pull-secret
+        - name: sshSecretName
+          value: hypershift-sshkey
+    syncPolicy:
+      automated: {}
+  clusterSetup:
+  - name: bobbycar Pattern Installation
+    spec:
+      destination:
+        namespace: clusters
+        server: 'https://kubernetes.default.svc'
+      project: default
+      source:
+        path: common/install
+        repoURL: https://github.com/hybrid-cloud-patterns/connected-vehicle-architecture/
+        targetRevision: main
+        helm:
+          parameters:
+          - name: main.git.repoURL
+            value: $ARGOCD_APP_SOURCE_REPO_URL
+          - name: main.git.revision
+            value: $ARGOCD_APP_SOURCE_TARGET_REVISION
+          - name: main.git.clusterGroupName
+            value: hub
+      syncPolicy:
+        automated: {}
+  cost: 2
+---
+# Source: patterns-demo/templates/patterns.yaml
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplateInstance
+metadata:
+  name: demo-bobbycar
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
+spec:
+  clusterTemplateRef: hypershift-bobbycar
+  parameters:
+    - name: ocpVersion
+      value: 4.11.12
+    - name: baseDomain
+      # Probably this is wrong as it includes the hub's cluster name
+      value: region.example.com
+---
+# Source: patterns-demo/templates/quota.yaml
+apiVersion: clustertemplate.openshift.io/v1alpha1
+kind: ClusterTemplateQuota
+metadata:
+  name: demo-quota
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  budget: 5
+  allowedTemplates:
+  - name: hypershift-xray
+  - name: hypershift-bobbycar
+---
+# Source: patterns-demo/templates/secrets.yaml
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: hypershift-sshkey-external-secret
+spec:
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  data:
+  - secretKey: sshPrivateKey
+    remoteRef:
+      key: secret/data/hub/privatekey
+      property: content
+  target:
+    name: hypershift-sshkey
+    template:
+      type: Opaque
+      data:
+        ssh-privatekey: |-
+          {{ .sshPrivateKey | toString }}
+---
+# Source: patterns-demo/templates/secrets.yaml
+apiVersion: "external-secrets.io/v1beta1"
+kind: ExternalSecret
+metadata:
+  name: hypershift-pull-external-secret
+spec:
+  refreshInterval: 24h0m0s
+  secretStoreRef:
+    name: vault-backend
+    kind: ClusterSecretStore
+  data:
+  - secretKey: openshiftPullSecret
+    remoteRef:
+      key: secret/data/hub/openshiftPullSecret
+      property: content
+  target:
+    name: hypershift-pull-secret
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: |-
+          {{ .openshiftPullSecret | toString }}
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: hive.openshift.io/v1
+kind: HiveConfig
+metadata:
+  name: hive
+spec:
+  logLevel: debug
+  targetNamespace: hive
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: multicluster.openshift.io/v1
+kind: MultiClusterEngine
+metadata:
+  name: multiclusterengine
+spec: {}
