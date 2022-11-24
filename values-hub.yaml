@@ -11,14 +11,7 @@ clusterGroup:
   - golang-external-secrets
 
   subscriptions:
-    hive:
-      name: hive-operator
-      namespace: openshift-operators
-      channel: alpha
-      #channel: ocm-2.4 # more stable?
-      source: community-operators
-
-    hypershift:
+    mce:
       name: multicluster-engine
       namespace: multicluster-engine
       channel: stable-2.1
