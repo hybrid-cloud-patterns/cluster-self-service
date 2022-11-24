@@ -8,3 +8,7 @@ patterns:
 - name: bobbycar
   repo: https://github.com/hybrid-cloud-patterns/connected-vehicle-architecture/
   deploy: true
+
+secretStore:
+  name: vault-backend
+  kind: ClusterSecretStore
