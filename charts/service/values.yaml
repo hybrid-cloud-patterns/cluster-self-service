@@ -1,3 +1,6 @@
+global:
+  dummy: 0
+
 patterns:
 - name: xray
   repo: https://github.com/hybrid-cloud-patterns/medical-diagnosis/
