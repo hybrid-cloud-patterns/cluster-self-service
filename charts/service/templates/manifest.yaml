@@ -5,3 +5,9 @@ metadata:
 spec:
   logLevel: debug
   targetNamespace: hive
+---
+apiVersion: multicluster.openshift.io/v1
+kind: MultiClusterEngine
+metadata:
+  name: multiclusterengine
+spec: {}
