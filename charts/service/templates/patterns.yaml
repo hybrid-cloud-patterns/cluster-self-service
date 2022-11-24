@@ -33,10 +33,10 @@ spec:
       targetRevision: {{ $.Values.global.targetRevision }}
       helm:
         parameters:
-	- name: pullSecretName
-	  value: hypershift-pull-secret
-	- name: sshSecretName
-	  value: hypershift-sshkey
+        - name: pullSecretName
+          value: hypershift-pull-secret
+        - name: sshSecretName
+          value: hypershift-sshkey
     syncPolicy:
       automated: {}
   clusterSetup:
