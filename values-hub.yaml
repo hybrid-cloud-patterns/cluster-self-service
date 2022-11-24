@@ -23,6 +23,12 @@ clusterGroup:
       namespace: multicluster-engine
       channel: stable-2.1
 
+    caas:
+      name: cluster-aas-operator
+      namespace: openshift-operators
+      channel: alpha
+      source: community-operators
+
   projects:
   - hub
   - demo
