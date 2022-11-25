@@ -5,6 +5,7 @@ apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
   name: {{ .Values.infra.name }}-infra-creds
+  namespace: demo
   annotations:
     argocd.argoproj.io/sync-wave: "50"
 spec: 

@@ -8,7 +8,7 @@ metadata:
 spec:
   clusterDefinition:
     destination:
-      namespace: clusters
+      namespace: demo
       server: 'https://kubernetes.default.svc'
     project: default
     source:
@@ -43,7 +43,7 @@ spec:
   - name: {{ .name }} Pattern Installation
     spec:
       destination:
-        namespace: clusters
+        namespace: demo
         server: 'https://kubernetes.default.svc'
       project: default
       source:

@@ -1,11 +1,14 @@
 ---
+# Source: patterns-demo/templates/infra.yaml
+# https://github.com/stolostron/hypershift-deployment-controller/blob/359179cd6b6e60d4999a9b0026f7ad6ecc39c925/docs/provision_hypershift_clusters_by_mce.md
+---
 # Source: patterns-demo/templates/patterns.yaml
 apiVersion: clustertemplate.openshift.io/v1alpha1
 kind: ClusterTemplate
 metadata:
   name: hypershift-xray
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "30"
 spec:
   clusterDefinition:
     destination:
@@ -69,7 +72,7 @@ kind: ClusterTemplate
 metadata:
   name: hypershift-bobbycar
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "30"
 spec:
   clusterDefinition:
     destination:
@@ -133,10 +136,14 @@ kind: ClusterTemplateInstance
 metadata:
   name: demo-bobbycar
   annotations:
-    argocd.argoproj.io/sync-wave: "30"
+    argocd.argoproj.io/sync-wave: "70"
 spec:
   clusterTemplateRef: hypershift-bobbycar
   parameters:
+    - name: infra.creds
+      value: hypershift-infra-creds
+    - name: infra.region
+      value: ap-southeast-2
     - name: ocpVersion
       value: 4.11.12
     - name: baseDomain
@@ -149,71 +156,165 @@ kind: ClusterTemplateQuota
 metadata:
   name: demo-quota
   annotations:
-    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-wave: "50"
 spec:
   budget: 5
   allowedTemplates:
   - name: hypershift-xray
   - name: hypershift-bobbycar
 ---
-# Source: patterns-demo/templates/secrets.yaml
-apiVersion: "external-secrets.io/v1beta1"
+# Source: patterns-demo/templates/infra.yaml
+# For use when manually creating clusters with ACM
+apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: hypershift-sshkey-external-secret
-spec:
-  refreshInterval: 24h0m0s
-  secretStoreRef:
-    name: vault-backend
-    kind: ClusterSecretStore
-  data:
-  - secretKey: sshPrivateKey
-    remoteRef:
-      key: secret/data/hub/privatekey
-      property: content
-  target:
-    name: hypershift-sshkey
-    template:
-      type: Opaque
-      data:
-        ssh-privatekey: |-
-          {{ .sshPrivateKey | toString }}
----
-# Source: patterns-demo/templates/secrets.yaml
-apiVersion: "external-secrets.io/v1beta1"
-kind: ExternalSecret
-metadata:
-  name: hypershift-pull-external-secret
-spec:
-  refreshInterval: 24h0m0s
-  secretStoreRef:
-    name: vault-backend
-    kind: ClusterSecretStore
+  name: hypershift-infra-creds
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+spec: 
   data:
   - secretKey: openshiftPullSecret
     remoteRef:
       key: secret/data/hub/openshiftPullSecret
       property: content
+  - secretKey: awsKeyId
+    remoteRef:
+      key: secret/data/hub/aws
+      property: aws_access_key_id
+  - secretKey: awsAccessKey
+    remoteRef:
+      key: secret/data/hub/aws
+      property: aws_secret_access_key
+  - secretKey: sshPublicKey
+    remoteRef:
+      key: secret/data/hub/publickey
+      property: content
+  - secretKey: sshPrivateKey
+    remoteRef:
+      key: secret/data/hub/privatekey
+      property: content
+  refreshInterval: 24h0m0s
+  secretStoreRef: 
+    name: vault-backend
+    kind: ClusterSecretStore
   target:
-    name: hypershift-pull-secret
+    name: hypershift-infra-creds
+    creationPolicy: Owner
     template:
-      type: kubernetes.io/dockerconfigjson
+      type: Opaque
+      metadata:
+        labels:
+          cluster.open-cluster-management.io/credentials: ""
+          cluster.open-cluster-management.io/type: aws
       data:
-        .dockerconfigjson: |-
+        baseDomain: ""
+        pullSecret: |-
           {{ .openshiftPullSecret | toString }}
+        aws_access_key_id: |-
+          {{ .awsKeyId | toString }}
+        aws_secret_access_key: |-
+          {{ .awsAccessKey | toString }}
+        ssh-privatekey: |-
+          {{ .sshPrivateKey | toString }}
+        ssh-publickey: |-
+          {{ .sshPublicKey | toString }}
 ---
 # Source: patterns-demo/templates/prereqs.yaml
 apiVersion: hive.openshift.io/v1
 kind: HiveConfig
 metadata:
   name: hive
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   logLevel: debug
   targetNamespace: hive
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: cluster.open-cluster-management.io/v1
+kind: ManagedCluster
+metadata:
+  labels:
+    local-cluster: "true"
+    cloud: auto-detect
+    vendor: auto-detect
+  name: local-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+spec:
+  hubAcceptsClient: true
+  leaseDurationSeconds: 60
+#  managedClusterClientConfigs:
+#    - caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURNakNDQWhxZ0F3SUJBZ0lJQ1ZZUWhjVy9ENUl3RFFZSktvWklodmNOQVFFTEJRQXdOekVTTUJBR0ExVUUKQ3hNSmIzQmxibk5vYVdaME1TRXdId1lEVlFRREV4aHJkV0psTFdGd2FYTmxjblpsY2kxc...
+#  url: https://api.template-hub.blueprints.rhecoeng.com:6443
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+  name: hypershift-addon
+  namespace: local-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  installNamespace: open-cluster-management-agent-addon
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: addon.open-cluster-management.io/v1alpha1
+kind: ManagedClusterAddOn
+metadata:
+  name: work-manager
+  namespace: local-cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  installNamespace: open-cluster-management-agent-addon
+---
+# Source: patterns-demo/templates/prereqs.yaml
+apiVersion: internal.open-cluster-management.io/v1beta1
+kind: ManagedClusterInfo
+metadata:
+  labels:
+    local-cluster: "true"
+    name: local-cluster
+    vendor: OpenShift
+  name: local-cluster
+  namespace: local-cluster
+spec: {}
 ---
 # Source: patterns-demo/templates/prereqs.yaml
 apiVersion: multicluster.openshift.io/v1
 kind: MultiClusterEngine
 metadata:
   name: multiclusterengine
-spec: {}
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  availabilityConfig: High
+  overrides:
+    components:
+      - name: hypershift-preview
+        enabled: true
+      - name: assisted-service
+        enabled: true
+      - name: cluster-lifecycle
+        enabled: true
+      - name: cluster-manager
+        enabled: true
+      - name: discovery
+        enabled: true
+      - name: hive
+        enabled: true
+      - name: server-foundation
+        enabled: true
+      - name: cluster-proxy-addon
+        enabled: false
+      - name: managedserviceaccount-preview
+        enabled: false
+      - name: console-mce
+        enabled: true
+  targetNamespace: multicluster-engine

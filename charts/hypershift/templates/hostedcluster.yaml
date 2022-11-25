@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Namespace }}-{{ .Release.Name }}
 spec:
   hostingCluster: local-cluster
-  hostingNamespace: clusters
+  hostingNamespace: demo
 #  hostedClusterSpec:
 #    release:
 #      image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64  
