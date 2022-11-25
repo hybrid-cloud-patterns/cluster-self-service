@@ -1,6 +1,10 @@
 global:
   dummy: 0
 
+infra:
+  name: hypershift
+  location: north-pole
+
 patterns:
 - name: xray
   repo: https://github.com/hybrid-cloud-patterns/medical-diagnosis/
