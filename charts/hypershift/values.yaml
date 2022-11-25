@@ -4,5 +4,6 @@
 
 ocpVersion: 4.10.33
 baseDomain: example.com
-pullSecretName: hypershiftPullSecret
-sshSecretName: hypershiftSSHSecret
+infra:
+  region: ap-southeast-2
+  creds: my-infra-secret

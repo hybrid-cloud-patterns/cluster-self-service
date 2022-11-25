@@ -72,6 +72,10 @@ metadata:
 spec:
   clusterTemplateRef: hypershift-{{ .name }}
   parameters:
+    - name: infra.creds
+      value: {{ $.Values.infra.name }}-infra-creds
+    - name: infra.region
+      value: {{ $.Values.infra.region }}
     - name: ocpVersion
       value: 4.11.12
     - name: baseDomain

@@ -1,45 +1,18 @@
-apiVersion: hypershift.openshift.io/v1alpha1
-kind: HostedCluster
+# https://github.com/stolostron/hypershift-deployment-controller/blob/359179cd6b6e60d4999a9b0026f7ad6ecc39c925/docs/provision_hypershift_clusters_by_mce.md
+apiVersion: cluster.open-cluster-management.io/v1alpha1
+kind: HypershiftDeployment
 metadata:
   name: {{ .Release.Namespace }}-{{ .Release.Name }}
 spec:
-  release:
-    image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64
-  pullSecret:
-    name: {{ .pullSecretName }}
-  sshKey:
-    name: {{ .sshSecretName }}
-  networking:
-    clusterNetwork:
-    - cidr: 10.132.0.0/14
-    serviceNetwork:
-    - cidr: 172.31.0.0/16
-    machineNetwork:
-    - cidr: 192.168.122.0/24
-    networkType: OVNKubernetes
-  platform:
-     type: aws
-     aws:
-       region: ap-southeast-2
-#    type: Agent
-#    agent:
-#      agentNamespace: devconf-infra
-  infraID: {{ .Release.Name }}
-  dns:
-    baseDomain: {{ .Values.baseDomain }}
-  services:
-  - service: APIServer
-    servicePublishingStrategy:
-      type: LoadBalancer
-  - service: OAuthServer
-    servicePublishingStrategy:
-      type: Route
-  - service: OIDC
-    servicePublishingStrategy:
-      type: Route
-  - service: Konnectivity
-    servicePublishingStrategy:
-      type: Route
-  - service: Ignition
-    servicePublishingStrategy:
-      type: Route
+  hostingCluster: local-cluster
+  hostingNamespace: clusters
+  hostedClusterSpec:
+    release:
+      image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64  
+  infrastructure:
+    cloudProvider:
+      name: {{ .Values.infra.creds }}
+    configure: True
+    platform:
+      aws:
+        region: {{ .Values.infra.region }}

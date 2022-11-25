@@ -3,6 +3,7 @@ global:
 
 infra:
   name: hypershift
+  region: ap-southeast-2
   location: north-pole
 
 patterns:

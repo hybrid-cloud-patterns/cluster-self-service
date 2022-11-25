@@ -1,97 +1,56 @@
+# https://github.com/stolostron/hypershift-deployment-controller/blob/359179cd6b6e60d4999a9b0026f7ad6ecc39c925/docs/provision_hypershift_clusters_by_mce.md
 ---
-apiVersion: "external-secrets.io/v1beta1"
+# For use when manually creating clusters with ACM
+apiVersion: external-secrets.io/v1beta1
 kind: ExternalSecret
 metadata:
-  name: {{ .Values.infra.name }}-sshkey-external-secret
+  name: {{ .Values.infra.name }}-infra-creds
   annotations:
     argocd.argoproj.io/sync-wave: "50"
-spec:
-  refreshInterval: 24h0m0s
-  secretStoreRef:
-    name: {{ .Values.secretStore.name }}
-    kind: {{ .Values.secretStore.kind }}
-  data:
-  - secretKey: sshPrivateKey
-    remoteRef:
-      key: {{ default "secret/data/hub/privatekey" .sshPrivateKeyPath }}
-      property: content
-  target:
-    name: {{ .Values.infra.name }}-sshkey
-    template:
-      type: Opaque
-      data:
-        ssh-privatekey: |-
-          {{ "{{ .sshPrivateKey | toString }}" }}  
----
-apiVersion: "external-secrets.io/v1beta1"
-kind: ExternalSecret
-metadata:
-  name: {{ .Values.infra.name }}-pull-external-secret
-  annotations:
-    argocd.argoproj.io/sync-wave: "50"
-spec:
-  refreshInterval: 24h0m0s
-  secretStoreRef:
-    name: {{ .Values.secretStore.name }}
-    kind: {{ .Values.secretStore.kind }}
+spec: 
   data:
   - secretKey: openshiftPullSecret
     remoteRef:
       key: {{ default "secret/data/hub/openshiftPullSecret" .pullSecretKeyPath }}
       property: content
-  target:
-    name: {{ .Values.infra.name }}-pull-secret
-    template:
-      type: kubernetes.io/dockerconfigjson
-      data:
-        .dockerconfigjson: |-
-          {{ "{{ .openshiftPullSecret | toString }}" }}
----
-apiVersion: "external-secrets.io/v1beta1"
-kind: ExternalSecret
-metadata:
-  name: {{ .Values.infra.name }}-sshkey-external-secret
-  annotations:
-    argocd.argoproj.io/sync-wave: "50"
-spec:
-  refreshInterval: 24h0m0s
-  secretStoreRef:
-    name: {{ .Values.secretStore.name }}
-    kind: {{ .Values.secretStore.kind }}
-  data:
-  - secretKey: sshPrivateKey
+  - secretKey: awsKeyId
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: aws_access_key_id
+  - secretKey: awsAccessKey
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: aws_secret_access_key
+  - secretKey: sshPublicKey
     remoteRef:
       key: {{ default "secret/data/hub/publickey" .sshPublicKeyPath }}
       property: content
+  - secretKey: sshPrivateKey
+    remoteRef:
+      key: {{ default "secret/data/hub/privatekey" .sshPrivateKeyPath }}
+      property: content
+  refreshInterval: 24h0m0s
+  secretStoreRef: 
+    name: {{ $.Values.secretStore.name }}
+    kind: {{ $.Values.secretStore.kind }}
   target:
-    apiVersion: agent-install.openshift.io/v1beta1
-    kind: InfraEnv
-    metadata:
-      name: {{ .Values.infra.name }}
-      namespace: {{ .Values.infra.name }}
-      labels:
-        agentclusterinstalls.extensions.hive.openshift.io/location: {{ .Values.infra.location }}
-        networkType: dhcp
-    spec:
-      agentLabels:
-        'agentclusterinstalls.extensions.hive.openshift.io/location': {{ .Values.infra.location }}
-      pullSecretRef:
-        name: {{ .Values.infra.name }}-pull-secret
-      sshAuthorizedKey: |-
-              {{ "{{ .sshPublicKey | toString }}" }}
-      nmStateConfigLabelSelector:	
-          matchLabels:	
-            infraenvs.agent-install.openshift.io: {{ .Values.infra.name }}
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: capi-provider-role
-  namespace: {{ .Values.infra.name }}
-rules:
-  - verbs:
-      - '*'
-    apiGroups:
-      - agent-install.openshift.io
-    resources:
-      - agents
+    name: {{ .Values.infra.name }}-infra-creds
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      metadata:
+        labels:
+          cluster.open-cluster-management.io/credentials: ""
+          cluster.open-cluster-management.io/type: aws
+      data:
+        baseDomain: "{{ .baseDomain }}"
+        pullSecret: |-
+          {{ "{{ .openshiftPullSecret | toString }}" }}
+        aws_access_key_id: |-
+          {{ "{{ .awsKeyId | toString }}" }}
+        aws_secret_access_key: |-
+          {{ "{{ .awsAccessKey | toString }}" }}
+        ssh-privatekey: |-
+          {{ "{{ .sshPrivateKey | toString }}" }}
+        ssh-publickey: |-
+          {{ "{{ .sshPublicKey | toString }}" }}

@@ -90,4 +90,4 @@ metadata:
     argocd.argoproj.io/sync-wave: "20"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
-  installNamespace: open-cluster-management-agent-addon  
+  installNamespace: open-cluster-management-agent-addon
