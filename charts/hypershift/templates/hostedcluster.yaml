@@ -16,3 +16,5 @@ spec:
     platform:
       aws:
         region: {{ .Values.infra.region }}
+        zones:
+        - {{ .Values.infra.region }}a
