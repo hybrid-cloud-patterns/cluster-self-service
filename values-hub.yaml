@@ -51,4 +51,8 @@ clusterGroup:
         kind: ManagedClusterInfo
         jsonPointers:
           - /spec/loggingCA
+      - group: cluster.open-cluster-management.io
+        kind: ManagedCluster
+        jsonPointers:
+          - /metadata/labels
 
