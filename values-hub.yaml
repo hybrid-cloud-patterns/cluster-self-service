@@ -7,6 +7,7 @@ clusterGroup:
   - hive
   - vault
   - demo
+  - clusters
   - hypershift
   - multicluster-engine
   - golang-external-secrets
