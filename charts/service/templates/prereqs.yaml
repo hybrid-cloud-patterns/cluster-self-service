@@ -59,6 +59,17 @@ spec:
 #    - caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURNakNDQWhxZ0F3SUJBZ0lJQ1ZZUWhjVy9ENUl3RFFZSktvWklodmNOQVFFTEJRQXdOekVTTUJBR0ExVUUKQ3hNSmIzQmxibk5vYVdaME1TRXdId1lEVlFRREV4aHJkV0psTFdGd2FYTmxjblpsY2kxc...
 #  url: https://api.template-hub.blueprints.rhecoeng.com:6443
 ---
+apiVersion: internal.open-cluster-management.io/v1beta1
+kind: ManagedClusterInfo
+metadata:
+  labels:
+    local-cluster: "true"
+    name: local-cluster
+    vendor: OpenShift
+  name: local-cluster
+  namespace: local-cluster
+spec: {}
+---
 apiVersion: addon.open-cluster-management.io/v1alpha1
 kind: ManagedClusterAddOn
 metadata:
