@@ -17,11 +17,11 @@ spec:
   - secretKey: awsKeyId
     remoteRef:
       key: {{ default "secret/data/hub/aws" .awsKeyPath }}
-      property: aws_access_key_id
+      property: access_key_id
   - secretKey: awsAccessKey
     remoteRef:
       key: {{ default "secret/data/hub/aws" .awsKeyPath }}
-      property: aws_secret_access_key
+      property: secret_access_key
   - secretKey: sshPublicKey
     remoteRef:
       key: {{ default "secret/data/hub/publickey" .sshPublicKeyPath }}
@@ -55,3 +55,54 @@ spec:
           {{ "{{ .sshPrivateKey | toString }}" }}
         ssh-publickey: |-
           {{ "{{ .sshPublicKey | toString }}" }}
+---
+# For use when manually creating clusters with ACM
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: hypershift-operator-oidc-provider-s3-credentials
+  namespace: demo
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+spec: 
+  data:
+  - secretKey: awsKeyId
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: access_key_id
+  - secretKey: awsAccessKey
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: secret_access_key
+  - secretKey: awsBucketName
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: bucket_name
+  - secretKey: awsBucketRegion
+    remoteRef:
+      key: {{ default "secret/data/hub/aws" .awsKeyPath }}
+      property: bucket_region
+  refreshInterval: 24h0m0s
+  secretStoreRef: 
+    name: {{ $.Values.secretStore.name }}
+    kind: {{ $.Values.secretStore.kind }}
+  target:
+    name: hypershift-operator-oidc-provider-s3-credentials
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        bucket: |-
+          {{ "{{ .awsBucketName | toString }}" }}
+        region: |-
+          {{ "{{ .awsBucketRegion | toString }}" }}
+        aws_access_key_id: |-
+          {{ "{{ .awsKeyId | toString }}" }}
+        aws_secret_access_key: |-
+          {{ "{{ .awsAccessKey | toString }}" }}
+
+# The bucket field contains an S3 bucket with public access to host OIDC
+#  discovery documents for your HyperShift clusters.
+#
+# BUCKET_NAME=your-bucket-name
+# aws s3api create-bucket --acl public-read --bucket $BUCKET_NAME --region $BUCKET_REGION
