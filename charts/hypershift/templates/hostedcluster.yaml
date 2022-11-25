@@ -4,8 +4,8 @@ kind: HypershiftDeployment
 metadata:
   name: {{ .Release.Namespace }}-{{ .Release.Name }}
 spec:
-  hostingCluster: local-cluster
-  hostingNamespace: demo
+  hostingCluster: local-cluster # defaults to current namespace
+#  hostingNamespace: demo # defaults to current namespace
 #  hostedClusterSpec:
 #    release:
 #      image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64  
@@ -16,5 +16,5 @@ spec:
     platform:
       aws:
         region: {{ .Values.infra.region }}
-        zones:
-        - {{ .Values.infra.region }}a
+#        zones:
+#        - {{ .Values.infra.region }}a
