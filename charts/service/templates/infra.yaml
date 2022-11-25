@@ -44,7 +44,7 @@ spec:
           cluster.open-cluster-management.io/credentials: ""
           cluster.open-cluster-management.io/type: aws
       data:
-        baseDomain: "{{ .baseDomain }}"
+        baseDomain: "{{ $.Values.infra.baseDomain }}"
         pullSecret: |-
           {{ "{{ .openshiftPullSecret | toString }}" }}
         aws_access_key_id: |-

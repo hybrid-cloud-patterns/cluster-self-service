@@ -5,6 +5,7 @@ infra:
   name: hypershift
   region: ap-southeast-2
   location: north-pole
+  baseDomain: blueprints.rhecoeng.com
 
 patterns:
 - name: xray

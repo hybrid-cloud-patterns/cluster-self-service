@@ -79,8 +79,8 @@ spec:
     - name: ocpVersion
       value: 4.11.12
     - name: baseDomain
-      # Probably this is wrong as it includes the hub's cluster name
-      value: {{ $.Values.global.clusterDomain }}
+      # Can't use $.Values.global.clusterDomain as it includes the hub's cluster name
+      value: {{ $.Values.infra.baseDomain }}
 {{- end }}
 ---
 {{- end }}
