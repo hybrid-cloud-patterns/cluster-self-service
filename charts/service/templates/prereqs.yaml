@@ -2,6 +2,8 @@ apiVersion: hive.openshift.io/v1
 kind: HiveConfig
 metadata:
   name: hive
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   logLevel: debug
   targetNamespace: hive
@@ -10,6 +12,8 @@ apiVersion: multicluster.openshift.io/v1
 kind: MultiClusterEngine
 metadata:
   name: multiclusterengine
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   availabilityConfig: High
   overrides:
@@ -46,6 +50,7 @@ metadata:
   name: local-cluster
   annotations:
     argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   hubAcceptsClient: true
   leaseDurationSeconds: 60
@@ -60,6 +65,7 @@ metadata:
   namespace: local-cluster
   annotations:
     argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   installNamespace: open-cluster-management-agent-addon
 ---
@@ -70,5 +76,6 @@ metadata:
   namespace: local-cluster
   annotations:
     argocd.argoproj.io/sync-wave: "20"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   installNamespace: open-cluster-management-agent-addon  
