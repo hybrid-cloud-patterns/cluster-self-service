@@ -6,9 +6,9 @@ metadata:
 spec:
   hostingCluster: local-cluster
   hostingNamespace: clusters
-  hostedClusterSpec:
-    release:
-      image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64  
+#  hostedClusterSpec:
+#    release:
+#      image: quay.io/openshift-release-dev/ocp-release:{{ .Values.ocpVersion }}-x86_64  
   infrastructure:
     cloudProvider:
       name: {{ .Values.infra.creds }}
