@@ -6,6 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "30"
 spec:
+  argocdNamespace: openshift-gitops
   clusterDefinition:
     destination:
       namespace: clusters

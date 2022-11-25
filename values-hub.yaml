@@ -6,6 +6,7 @@ clusterGroup:
   namespaces:
   - hive
   - vault
+  - demo
   - hypershift
   - multicluster-engine
   - golang-external-secrets
@@ -42,6 +43,6 @@ clusterGroup:
     patterns:
       project: hub
       name: cluster-template-service
-      namespace: hive
+      namespace: demo
       path: charts/service
 
