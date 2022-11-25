@@ -46,4 +46,9 @@ clusterGroup:
       name: cluster-template-service
       namespace: demo
       path: charts/service
+      ignoreDifferences:
+      - group: internal.open-cluster-management.io
+        kind: ManagedClusterInfo
+        jsonPointers:
+          - /spec/loggingCA
 
