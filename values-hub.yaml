@@ -8,6 +8,7 @@ clusterGroup:
   - vault
   - demo
   - clusters
+  - local-cluster
   - hypershift
   - multicluster-engine
   - golang-external-secrets
