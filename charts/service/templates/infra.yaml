@@ -96,9 +96,9 @@ spec:
           {{ "{{ .awsBucketName | toString }}" }}
         region: |-
           {{ "{{ .awsBucketRegion | toString }}" }}
-        aws_access_key_id: |-
+        aws-access-key-id: |-
           {{ "{{ .awsKeyId | toString }}" }}
-        aws_secret_access_key: |-
+        aws-secret-access-key: |-
           {{ "{{ .awsAccessKey | toString }}" }}
 
 # The bucket field contains an S3 bucket with public access to host OIDC
